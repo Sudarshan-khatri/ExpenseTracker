@@ -12,6 +12,16 @@ class ExpenseIncomeViewset(viewsets.ModelViewSet):
     queryset=ExpenseIncome.objects.all().order_by('-id')
     serializer_class=ExpenseIncomeListSerializer
     permission_classes=[ExpenseIncomePermission]
+
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return ExpenseIncome.objects.all()
+        return ExpenseIncome.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     # pagination_class=CustomPagination
 
 
